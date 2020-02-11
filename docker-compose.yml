@@ -1,0 +1,58 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: ./docker/development
+      dockerfile: nginx.docker
+    volumes:
+      - ./app/public_html/:/app
+    depends_on:
+      - php-fpm
+    ports:
+      - "80:80"
+
+  php-fpm:
+    build:
+      context: ./docker/development
+      dockerfile: php-fpm.docker
+    volumes:
+      - ./app/public_html/:/app
+    depends_on:
+      - db
+
+  php-cli:
+    build:
+      context: ./docker/development
+      dockerfile: php-cli.docker
+    volumes:
+      - ./app/public_html/:/app
+      - composer:/root/.composer/cache
+    depends_on:
+      - db
+    tty: true
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - ./db/:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  php-my-admin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+
+
+volumes:
+  composer:

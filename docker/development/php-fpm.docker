@@ -1,0 +1,17 @@
+FROM php:7.4-fpm
+
+RUN apt-get update  && apt-get -y install libpq-dev unzip\
+            libmagickwand-dev \
+        --no-install-recommends \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && rm -r /var/lib/apt/lists/*
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer --quiet
+
+RUN docker-php-ext-install pcntl
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+
+WORKDIR /app
